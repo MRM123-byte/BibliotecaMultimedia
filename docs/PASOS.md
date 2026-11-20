@@ -32,3 +32,23 @@ Se habilitará mantenimiento del catálogo solo para el rol Catalogador, sin pan
 de administración. Es una adaptación al CRUD evaluado: los usuarios normales
 solo administran sus bibliotecas. La importación real desde TMDB y RAWG queda
 para después. Los datos de prueba son ficticios y no afirman existir en las API.
+
+## 3. DTO, controladores y autenticación
+
+Los DTO de entrada tienen solo campos editables. Los de salida omiten contraseñas,
+tokens y propiedades internas de EF. Las validaciones de campos se ejecutan con
+ApiController; las referencias inexistentes y reglas del dominio se comprueban
+antes de guardar. SQL Server conserva la última protección ante duplicados o carreras.
+
+Un POST correcto devuelve 201 y Location mediante CreatedAtAction. PUT reemplaza
+los datos editables y devuelve 204; DELETE devuelve 204. Un recurso inexistente
+devuelve 404, mientras que una referencia inválida en un cuerpo devuelve 400.
+
+La biblioteca obtiene el usuario desde el token autenticado, nunca del cuerpo de
+la petición. Una entrada ajena se trata como no encontrada para no revelar su
+existencia. El catálogo se puede leer sin sesión, pero solo Catalogador puede
+modificarlo. Los controladores privados admiten Bearer, no cookies.
+
+Identity proporciona registro y login. Sus accessToken son tokens opacos, no JWT.
+Swagger permite pegarlos en Authorize para probar los endpoints protegidos.
+Los métodos usan operaciones asíncronas de EF y reciben DbContext por inyección.
