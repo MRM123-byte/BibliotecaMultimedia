@@ -4,13 +4,13 @@ Proyecto final de Programación Web III: catálogo compartido y biblioteca perso
 
 - **Integrante:** Mauricio Rivero Mendez.
 - **GitHub:** [MRM123-byte](https://github.com/MRM123-byte).
-- **Repositorio Git:** PENDIENTE de creación/vinculación. Añadir el enlace real antes de entregar.
+- **Repositorio Git:** [MRM123-byte/BibliotecaMultimedia](https://github.com/MRM123-byte/BibliotecaMultimedia).
 - **Versión:** .NET 10 (SDK 10.0.400 utilizado), ASP.NET Core 10 y EF Core 10.0.15.
 - **Persistencia:** SQL Server. **Swagger:** Swashbuckle.AspNetCore 10.2.3.
 
-> Esta es una entrega preliminar hasta publicar el repositorio y añadir su enlace.
-> El historial local contiene commits por etapas. El ZIP no sustituye al repositorio
-> que debe poder revisar el profesor.
+> El repositorio es público y conserva el historial de commits por etapas para
+> la revisión del profesor. El ZIP incluye el proyecto, las migraciones y el PDF
+> de evidencias; el historial se consulta directamente en GitHub.
 
 ## 1. Preparar el equipo
 
@@ -186,8 +186,17 @@ mediante la dirección noreply de MRM123-byte. Revisar con git log --oneline y
 git show. El estudiante debe revisar, comprender y poder explicar los cambios
 realizados con asistencia.
 
-Antes de entregar: vincular un repositorio remoto, publicar el historial,
-comprobar el acceso del profesor y reemplazar el enlace pendiente. Luego:
+El repositorio público está disponible en
+[GitHub](https://github.com/MRM123-byte/BibliotecaMultimedia), con el historial
+completo en la rama `main`. Para obtener una copia:
+
+```powershell
+git clone https://github.com/MRM123-byte/BibliotecaMultimedia.git
+cd BibliotecaMultimedia
+```
+
+Después de guardar nuevos cambios en Git, actualizar el remoto con `git push`
+y volver a generar el ZIP desde la raíz del proyecto:
 
 ```powershell
 python scripts/empaquetar.py

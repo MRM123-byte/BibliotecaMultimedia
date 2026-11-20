@@ -34,4 +34,5 @@ se implementa la fusión de proveedores ni se permite dejar una ficha sin refere
 
 No incluye frontend MVC, llamadas reales a proveedores, correo, funciones sociales
 ni Android. Catalogador es un rol técnico para el CRUD, no un panel administrativo.
-La publicación del repositorio remoto queda pendiente de la decisión del integrante.
+El código y el historial están publicados en el repositorio público
+[MRM123-byte/BibliotecaMultimedia](https://github.com/MRM123-byte/BibliotecaMultimedia).
