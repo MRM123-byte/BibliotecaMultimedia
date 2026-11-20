@@ -4,7 +4,7 @@ Proyecto final de Programación Web III. API para gestionar un catálogo de pel�
 series y videojuegos y la biblioteca privada de cada usuario.
 
 - Integrante: **Mauricio Rivero Mendez**.
-- Usuario de GitHub: pendiente de indicar por el integrante.
+- Usuario de GitHub: [MRM123-byte](https://github.com/MRM123-byte).
 - Repositorio Git: pendiente de creación o vinculación.
 - Plataforma: **.NET 10**, ASP.NET Core, Entity Framework Core y SQL Server.
 
@@ -25,3 +25,25 @@ Swagger local: http://localhost:5189/swagger
 Los pasos de base de datos, migraciones y pruebas se documentarán al completar
 las siguientes etapas. Las integraciones reales con TMDB y RAWG corresponden
 a una etapa posterior; esta entrega se verificará con datos de prueba locales.
+
+## Paso 2: SQL Server y migraciones
+
+Instalar SQL Server (Developer o Express) y tener permisos para crear una base
+de datos. SSMS es una herramienta de administración, no sustituye al servidor.
+La conexión de ejemplo en appsettings.json usa autenticación de Windows:
+
+```text
+Server=localhost;Database=BibliotecaMultimediaDb;Trusted_Connection=True;TrustServerCertificate=True
+```
+
+Si se usa una instancia con nombre, sustituir localhost por localhost\\NOMBRE_INSTANCIA
+en JSON (dos barras para representar una). No guardar contraseñas reales en Git.
+
+```powershell
+dotnet tool restore
+dotnet ef database update --project src/BibliotecaMultimedia.Api
+```
+
+La migración Inicial está incluida. No es necesario crear otra al clonar el
+proyecto. El modelo incluye las seis entidades del dominio y las tablas técnicas
+de ASP.NET Core Identity.
