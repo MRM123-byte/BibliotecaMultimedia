@@ -10,7 +10,7 @@ public class BibliotecaCrearDto
 public class BibliotecaActualizarDto
 {
     [EnumDataType(typeof(EstadoConsumo))] public EstadoConsumo Estado { get; set; }
-    [Range(1,10)] public byte? Puntuacion { get; set; }
+    [Range(1, 10)] public byte? Puntuacion { get; set; }
     [StringLength(4000)] public string? Resena { get; set; }
 }
 public record BibliotecaSalidaDto(int EntradaBibliotecaId, int ContenidoId, string Titulo,

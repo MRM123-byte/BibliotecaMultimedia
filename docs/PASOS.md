@@ -52,3 +52,18 @@ modificarlo. Los controladores privados admiten Bearer, no cookies.
 Identity proporciona registro y login. Sus accessToken son tokens opacos, no JWT.
 Swagger permite pegarlos en Authorize para probar los endpoints protegidos.
 Los métodos usan operaciones asíncronas de EF y reciben DbContext por inyección.
+
+## 4. Pruebas reproducibles
+
+El script scripts/probar_api.py ejecuta peticiones HTTP reales; no usa una base
+en memoria. Levanta un proceso en el puerto 5199, crea una ficha mediante POST,
+la actualiza y reinicia ese proceso. El GET posterior recupera el mismo ID y
+contenido desde SQL Server. El informe registra ambos PID y las respuestas.
+
+Se verificaron además 400 por campos inválidos, referencias inexistentes y notas
+fuera de rango; 404 por recursos inexistentes; y 401/403 para acceso no permitido.
+La prueba de acceso cruzado confirma que un usuario no puede leer ni editar la
+biblioteca de otro. Las fichas de evidencia se conservan para poder consultarlas.
+
+Se acotó la paginación para evitar desbordamiento al calcular Skip y se separaron
+las consultas de las colecciones relacionadas para evitar multiplicar filas.

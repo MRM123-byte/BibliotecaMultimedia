@@ -8,16 +8,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BibliotecaMultimedia.Api.Controllers;
 
-[ApiController,Route("api/usuarios")]
-[Authorize(Policy="UsuarioApi")]
-public class UsuariosController(BibliotecaDbContext db):ControllerBase
+[ApiController, Route("api/usuarios")]
+[Authorize(Policy = "UsuarioApi")]
+public class UsuariosController(BibliotecaDbContext db) : ControllerBase
 {
     /// <summary>Devuelve el perfil propio sin contraseñas ni información de otros usuarios.</summary>
-    [HttpGet("me"),ProducesResponseType<UsuarioSalidaDto>(200),ProducesResponseType(401)]
+    [HttpGet("me"), ProducesResponseType<UsuarioSalidaDto>(200), ProducesResponseType(401)]
     public async Task<ActionResult<UsuarioSalidaDto>> Perfil()
     {
-        var id=User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var u=await db.Users.AsNoTracking().SingleOrDefaultAsync(u=>u.Id==id);
-        return u is null ? Unauthorized() : Ok(new UsuarioSalidaDto(u.Id,u.Email!,u.FechaRegistroUtc));
+        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var u = await db.Users.AsNoTracking().SingleOrDefaultAsync(u => u.Id == id);
+        return u is null ? Unauthorized() : Ok(new UsuarioSalidaDto(u.Id, u.Email!, u.FechaRegistroUtc));
     }
 }

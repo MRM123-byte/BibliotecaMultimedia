@@ -18,7 +18,7 @@ builder.Services.AddIdentityApiEndpoints<Usuario>(options =>
 builder.Services.AddAuthorization(options => options.AddPolicy("UsuarioApi", policy =>
     policy.AddAuthenticationSchemes(IdentityConstants.BearerScheme).RequireAuthenticatedUser()));
 builder.Services.AddControllers().AddJsonOptions(options =>
-    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues:false)));
+    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false)));
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddEndpointsApiExplorer();
@@ -30,23 +30,24 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Mauricio Rivero Mendez. Inicia sesión en /api/auth/login (useCookies=false), copia accessToken y pégalo en Authorize. Catálogo: lectura pública y escritura para Catalogador. Biblioteca: acceso privado. Datos de demostración ficticios; sin llamadas externas."
     });
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory,"BibliotecaMultimedia.Api.xml"));
-    options.AddSecurityDefinition("Bearer",new OpenApiSecurityScheme
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "BibliotecaMultimedia.Api.xml"));
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Type=SecuritySchemeType.Http,Scheme="bearer",
-        Description="Token opaco de ASP.NET Core Identity (no es un JWT). Pega solamente accessToken."
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        Description = "Token opaco de ASP.NET Core Identity (no es un JWT). Pega solamente accessToken."
     });
     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
     {
-        [new OpenApiSecuritySchemeReference("Bearer",document)]=[]
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
     });
 });
 
 var app = builder.Build();
-if(args.Contains("--seed"))
+if (args.Contains("--seed"))
 {
-    if(!app.Environment.IsDevelopment()) throw new InvalidOperationException("La carga de prueba solo se permite en Development.");
-    await DatosPrueba.CargarAsync(app.Services,app.Configuration);
+    if (!app.Environment.IsDevelopment()) throw new InvalidOperationException("La carga de prueba solo se permite en Development.");
+    await DatosPrueba.CargarAsync(app.Services, app.Configuration);
     Console.WriteLine("Datos de prueba cargados. Las cuentas y obras existentes no fueron reemplazadas.");
     return;
 }
