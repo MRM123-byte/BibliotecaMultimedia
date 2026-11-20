@@ -1,49 +1,204 @@
 # Biblioteca Multimedia API
 
-Proyecto final de Programación Web III. API para gestionar un catálogo de películas,
-series y videojuegos y la biblioteca privada de cada usuario.
+Proyecto final de Programación Web III: catálogo compartido y biblioteca personal.
 
-- Integrante: **Mauricio Rivero Mendez**.
-- Usuario de GitHub: [MRM123-byte](https://github.com/MRM123-byte).
-- Repositorio Git: pendiente de creación o vinculación.
-- Plataforma: **.NET 10**, ASP.NET Core, Entity Framework Core y SQL Server.
+- **Integrante:** Mauricio Rivero Mendez.
+- **GitHub:** [MRM123-byte](https://github.com/MRM123-byte).
+- **Repositorio Git:** PENDIENTE de creación/vinculación. Añadir el enlace real antes de entregar.
+- **Versión:** .NET 10 (SDK 10.0.400 utilizado), ASP.NET Core 10 y EF Core 10.0.15.
+- **Persistencia:** SQL Server. **Swagger:** Swashbuckle.AspNetCore 10.2.3.
 
-## Paso 1: estructura inicial
+> Esta es una entrega preliminar hasta publicar el repositorio y añadir su enlace.
+> El historial local contiene commits por etapas. El ZIP no sustituye al repositorio
+> que debe poder revisar el profesor.
 
-La solución está en `BibliotecaMultimedia.slnx` y la Web API en
-`src/BibliotecaMultimedia.Api`. Se utilizarán controladores, modelos, DTO y una
-carpeta de datos para mantener separadas las responsabilidades.
+## 1. Preparar el equipo
+
+Instalar el SDK .NET 10 y SQL Server Developer o Express. SSMS es opcional para
+inspeccionar las tablas; no sustituye al motor SQL Server. Se requiere acceso a
+NuGet y permiso para crear la base local. Ejecutar desde la raíz del proyecto:
 
 ```powershell
 dotnet restore
+dotnet tool restore
 dotnet build
-dotnet run --project src/BibliotecaMultimedia.Api --launch-profile http
 ```
 
-Swagger local: http://localhost:5189/swagger
+Python 3 solo se necesita para las pruebas automatizadas y el empaquetado;
+no es una dependencia de la API.
 
-Los pasos de base de datos, migraciones y pruebas se documentarán al completar
-las siguientes etapas. Las integraciones reales con TMDB y RAWG corresponden
-a una etapa posterior; esta entrega se verificará con datos de prueba locales.
+## 2. Conexión local a SQL Server
 
-## Paso 2: SQL Server y migraciones
-
-Instalar SQL Server (Developer o Express) y tener permisos para crear una base
-de datos. SSMS es una herramienta de administración, no sustituye al servidor.
-La conexión de ejemplo en appsettings.json usa autenticación de Windows:
+`src/BibliotecaMultimedia.Api/appsettings.json` contiene un ejemplo sin credenciales reales:
 
 ```text
 Server=localhost;Database=BibliotecaMultimediaDb;Trusted_Connection=True;TrustServerCertificate=True
 ```
 
-Si se usa una instancia con nombre, sustituir localhost por localhost\\NOMBRE_INSTANCIA
-en JSON (dos barras para representar una). No guardar contraseñas reales en Git.
+Usa autenticación de Windows. Para una instancia con nombre, dentro de JSON
+puede usarse `Server=localhost\\SQLEXPRESS` (dos barras representan una).
+También se puede configurar la conexión solo para la terminal actual:
 
 ```powershell
-dotnet tool restore
+$env:ConnectionStrings__Biblioteca='Server=localhost;Database=BibliotecaMultimediaDb;Trusted_Connection=True;TrustServerCertificate=True'
+```
+
+No guardar contraseñas reales en Git. TrustServerCertificate se utiliza para
+el desarrollo local; producción necesita un certificado válido. Esta conexión
+no modifica las bases de otros proyectos.
+
+## 3. Aplicar migraciones
+
+```powershell
 dotnet ef database update --project src/BibliotecaMultimedia.Api
 ```
 
-La migración Inicial está incluida. No es necesario crear otra al clonar el
-proyecto. El modelo incluye las seis entidades del dominio y las tablas técnicas
-de ASP.NET Core Identity.
+La migración Inicial está incluida en `Data/Migrations`. No hace falta crear
+otra al clonar. El comando crea la base y aplica las migraciones pendientes.
+No usamos EnsureCreated ni borramos la base al iniciar. El esquema contiene
+las seis entidades del dominio y las tablas técnicas de ASP.NET Core Identity.
+
+## 4. Cargar datos de prueba
+
+```powershell
+$env:Seed__Password='Demo2026!Biblioteca'
+dotnet run --project src/BibliotecaMultimedia.Api --no-build --launch-profile http -- --seed
+```
+
+La contraseña es un ejemplo público para cuentas ficticias locales, no una
+credencial real. Puedes sustituirla antes de la primera carga.
+
+| Cuenta ficticia | Permiso |
+|---|---|
+| catalogador@example.test | CRUD del catálogo y biblioteca propia |
+| lector@example.test | Biblioteca propia y lectura del catálogo |
+
+Se crean géneros y tres obras ficticias. Sus referencias demo-* no corresponden
+a registros reales de proveedores. Repetir la carga no duplica sus registros ni
+restablece las contraseñas existentes. Solo funciona en Development.
+
+## 5. Abrir Swagger
+
+```powershell
+dotnet run --project src/BibliotecaMultimedia.Api --no-build --launch-profile http
+```
+
+Abrir **http://localhost:5189/swagger**. HTTP es solo para pruebas locales.
+El perfil https ofrece https://localhost:7183/swagger y puede requerir
+`dotnet dev-certs https --trust` para confiar en el certificado local.
+
+1. Abrir `POST /api/auth/login`, pulsar Try it out y dejar useCookies=false.
+2. Enviar el correo de prueba y la contraseña definida en el paso anterior.
+3. Copiar accessToken y pegarlo en Authorize, sin escribir Bearer delante.
+4. Ejecutar los endpoints. Para cambiar de usuario, retirar la autorización,
+   iniciar sesión con la otra cuenta y pegar su token.
+
+Identity emite tokens opacos, no JWT. Los controladores privados aceptan Bearer.
+Los GET del catálogo son públicos aunque Swagger permita adjuntarles un token.
+Retirar el token de Swagger no lo revoca en el servidor: el cierre de sesión
+completo del cliente final queda para otra etapa. Las rutas auxiliares de
+Identity para correo/2FA aparecen, pero no se configuró envío de correo ni
+se cuentan estas rutas como cobertura evaluada.
+
+## 6. Demostración paso a paso
+
+1. GET /api/generos: consultar un generoId existente.
+2. POST /api/contenidos como Catalogador con el ejemplo siguiente.
+3. Comprobar 201 y la cabecera Location; consultar el ID creado mediante GET.
+4. Ejecutar PUT y verificar sus cambios; consultar /{id}/generos y /{id}/referencias.
+5. Añadir la obra con POST /api/biblioteca; modificar estado, nota y reseña.
+6. Enviar una nota 11: 400. Consultar un ID inexistente: 404.
+7. Detener la API con Ctrl+C, iniciarla de nuevo y consultar el mismo ID: 200.
+8. Retirar la entrada personal y luego eliminar la ficha: ambos DELETE devuelven 204.
+
+Ejemplo POST/PUT de contenido; adaptar generoIds a la base local:
+
+```json
+{
+  "titulo": "Película de demostración",
+  "tipoContenido": "Pelicula",
+  "esAnime": false,
+  "descripcion": "Ficha ficticia para la evaluación.",
+  "imagenUrl": null,
+  "fechaLanzamiento": "2026-01-10",
+  "generoIds": [1],
+  "referencia": { "proveedor": "TMDB", "tipoRecurso": "movie", "idExterno": "demo-evaluacion-001" }
+}
+```
+
+Otra obra necesita otra referencia externa, no otro título. Para videojuegos:
+Videojuego, esAnime=false, RAWG y game. Para series: Serie, TMDB y tv.
+POST de biblioteca: `{"contenidoId":1}`. PUT de biblioteca:
+
+```json
+{"estado":"EnCurso","puntuacion":8,"resena":"Reseña privada de prueba."}
+```
+
+Estados: Pendiente, EnCurso, Completado, EnPausa, Abandonado. NULL retira la nota
+o reseña. Watchlist: GET /api/biblioteca?estado=Pendiente. PUT reemplaza campos
+editables, no es una modificación parcial. El propietario procede del token.
+
+## 7. Pruebas y evidencias
+
+Con compilación, migración y datos de prueba preparados:
+
+```powershell
+$env:Seed__Password='Demo2026!Biblioteca'
+python scripts/probar_api.py
+```
+
+El script usa su propio proceso en el puerto 5199 y la misma base de datos.
+Ejecuta 45 verificaciones HTTP reales, reinicia el proceso y compara los datos.
+Guarda resultados y PID en artifacts/evidencias/resultados.json, sin tokens.
+Conserva una ficha, un género y un usuario ficticio por ejecución para inspección.
+No detiene SQL Server ni la instancia que tengas en el puerto 5189.
+
+`docs/Evidencias.pdf` contiene capturas reales de Swagger y resultados de las
+pruebas; `docs/evidencias/resultados.json` conserva el registro. Los puertos 5189
+y 5199 usan la misma base. El PDF distingue el reinicio automático y la consulta
+posterior en Swagger. No son respuestas simuladas.
+
+Para regenerar capturas, scripts/capturar_swagger.cjs requiere Node, Playwright y
+Edge. Para regenerar el PDF, scripts/generar_evidencias.py requiere ReportLab y
+Pillow. Estas herramientas no son necesarias para ejecutar la Web API.
+
+## 8. Organización y alcance
+
+- Models: entidades y enumeraciones.
+- Data: contexto, migración y carga de prueba.
+- DTOs: contratos y mapeos de entrada/salida.
+- Controllers: rutas, autorización y reglas de esta etapa.
+- Infrastructure: manejo común de errores de persistencia.
+- docs/PASOS.md: explicación para la defensa.
+- docs/COBERTURA.md: relación entre Swagger y el diagrama.
+
+Las seis entidades y todas las relaciones están representadas. No significa que
+el producto final esté completo. Las reglas se extraerán a servicios reutilizables
+cuando añadamos MVC u otro cliente. Por ahora la organización responde a la
+rúbrica sin añadir capas innecesarias. TMDB/RAWG reales, importación externa,
+clasificación automática de anime, frontend y Android quedan para después.
+No se necesitan claves de API en esta entrega.
+
+## 9. Git y ZIP
+
+Los commits están separados por etapas y asociados a Mauricio Rivero Mendez
+mediante la dirección noreply de MRM123-byte. Revisar con git log --oneline y
+git show. El estudiante debe revisar, comprender y poder explicar los cambios
+realizados con asistencia.
+
+Antes de entregar: vincular un repositorio remoto, publicar el historial,
+comprobar el acceso del profesor y reemplazar el enlace pendiente. Luego:
+
+```powershell
+python scripts/empaquetar.py
+```
+
+El ZIP se genera en output/BibliotecaMultimedia-entrega.zip con archivos
+versionados, PDF y migraciones. Excluye bin, obj, .vs, .git y temporales.
+La base se reconstruye con migraciones y datos de prueba, no mediante un .bak.
+
+## Referencias técnicas
+
+- [Migraciones de EF Core](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
+- [Aplicar migraciones](https://learn.microsoft.com/en-us/ef/core/managing-schemas/migrations/applying)
+- [Swagger en ASP.NET Core](https://learn.microsoft.com/en-us/aspnet/core/tutorials/web-api-help-pages-using-swagger?view=aspnetcore-10.0)
