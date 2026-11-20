@@ -24,9 +24,6 @@ dotnet tool restore
 dotnet build
 ```
 
-Python 3 solo se necesita para las pruebas automatizadas y el empaquetado;
-no es una dependencia de la API.
-
 ## 2. Conexión local a SQL Server
 
 `src/BibliotecaMultimedia.Api/appsettings.json` contiene un ejemplo sin credenciales reales:
@@ -138,29 +135,11 @@ Estados: Pendiente, EnCurso, Completado, EnPausa, Abandonado. NULL retira la not
 o reseña. Watchlist: GET /api/biblioteca?estado=Pendiente. PUT reemplaza campos
 editables, no es una modificación parcial. El propietario procede del token.
 
-## 7. Pruebas y evidencias
+## 7. Evidencias
 
-Con compilación, migración y datos de prueba preparados:
-
-```powershell
-$env:Seed__Password='Demo2026!Biblioteca'
-python scripts/probar_api.py
-```
-
-El script usa su propio proceso en el puerto 5199 y la misma base de datos.
-Ejecuta 45 verificaciones HTTP reales, reinicia el proceso y compara los datos.
-Guarda resultados y PID en artifacts/evidencias/resultados.json, sin tokens.
-Conserva una ficha, un género y un usuario ficticio por ejecución para inspección.
-No detiene SQL Server ni la instancia que tengas en el puerto 5189.
-
-`docs/Evidencias.pdf` contiene capturas reales de Swagger y resultados de las
-pruebas; `docs/evidencias/resultados.json` conserva el registro. Los puertos 5189
-y 5199 usan la misma base. El PDF distingue el reinicio automático y la consulta
-posterior en Swagger. No son respuestas simuladas.
-
-Para regenerar capturas, scripts/capturar_swagger.cjs requiere Node, Playwright y
-Edge. Para regenerar el PDF, scripts/generar_evidencias.py requiere ReportLab y
-Pillow. Estas herramientas no son necesarias para ejecutar la Web API.
+`docs/Evidencias.pdf` contiene las capturas de Swagger, los resultados HTTP y
+la comprobación de persistencia después de reiniciar la aplicación.
+Para repetir las pruebas, seguir el recorrido de la sección 6 desde Swagger.
 
 ## 8. Organización y alcance
 
@@ -169,8 +148,7 @@ Pillow. Estas herramientas no son necesarias para ejecutar la Web API.
 - DTOs: contratos y mapeos de entrada/salida.
 - Controllers: rutas, autorización y reglas de esta etapa.
 - Infrastructure: manejo común de errores de persistencia.
-- docs/PASOS.md: explicación para la defensa.
-- docs/COBERTURA.md: relación entre Swagger y el diagrama.
+- docs/Evidencias.pdf: resultados de las pruebas de entrega.
 
 Las seis entidades y todas las relaciones están representadas. No significa que
 el producto final esté completo. Las reglas se extraerán a servicios reutilizables
@@ -195,15 +173,15 @@ git clone https://github.com/MRM123-byte/BibliotecaMultimedia.git
 cd BibliotecaMultimedia
 ```
 
-Después de guardar nuevos cambios en Git, actualizar el remoto con `git push`
-y volver a generar el ZIP desde la raíz del proyecto:
+Después de guardar nuevos cambios en Git, actualizar el remoto con `git push`.
+Para generar un ZIP de los archivos del último commit, ejecutar desde la raíz:
 
 ```powershell
-python scripts/empaquetar.py
+git archive --format=zip --prefix=BibliotecaMultimedia/ --output=BibliotecaMultimedia-entrega.zip HEAD
 ```
 
-El ZIP se genera en output/BibliotecaMultimedia-entrega.zip con archivos
-versionados, PDF y migraciones. Excluye bin, obj, .vs, .git y temporales.
+El ZIP incluye los archivos versionados, el PDF y las migraciones.
+Las carpetas bin, obj, .vs, .git y los temporales no se incluyen.
 La base se reconstruye con migraciones y datos de prueba, no mediante un .bak.
 
 ## Referencias técnicas

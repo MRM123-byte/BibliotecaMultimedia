@@ -10,4 +10,5 @@ artifacts/
 **/*.suo
 *.log
 .env
+*.zip
 TestResults/
