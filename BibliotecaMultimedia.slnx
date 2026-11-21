@@ -1,5 +1,3 @@
 <Solution>
-  <Folder Name="/src/">
-    <Project Path="src/BibliotecaMultimedia.Api/BibliotecaMultimedia.Api.csproj" />
-  </Folder>
+  <Project Path="BibliotecaMultimedia.Api.csproj" />
 </Solution>

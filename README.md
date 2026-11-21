@@ -9,8 +9,8 @@ Proyecto final de Programación Web III: catálogo compartido y biblioteca perso
 - **Persistencia:** SQL Server. **Swagger:** Swashbuckle.AspNetCore 10.2.3.
 
 > El repositorio es público y conserva el historial de commits por etapas para
-> la revisión del profesor. El ZIP incluye el proyecto, las migraciones y el PDF
-> de evidencias; el historial se consulta directamente en GitHub.
+> la revisión del profesor. El ZIP incluye solo el proyecto y sus migraciones.
+> El PDF de evidencias se entrega por separado; el historial se consulta en GitHub.
 
 ## 1. Preparar el equipo
 
@@ -26,7 +26,7 @@ dotnet build
 
 ## 2. Conexión local a SQL Server
 
-`src/BibliotecaMultimedia.Api/appsettings.json` contiene un ejemplo sin credenciales reales:
+`appsettings.json`, en la carpeta principal, contiene un ejemplo sin credenciales reales:
 
 ```text
 Server=localhost;Database=BibliotecaMultimediaDb;Trusted_Connection=True;TrustServerCertificate=True
@@ -47,7 +47,7 @@ no modifica las bases de otros proyectos.
 ## 3. Aplicar migraciones
 
 ```powershell
-dotnet ef database update --project src/BibliotecaMultimedia.Api
+dotnet ef database update
 ```
 
 La migración Inicial está incluida en `Data/Migrations`. No hace falta crear
@@ -59,7 +59,7 @@ las seis entidades del dominio y las tablas técnicas de ASP.NET Core Identity.
 
 ```powershell
 $env:Seed__Password='Demo2026!Biblioteca'
-dotnet run --project src/BibliotecaMultimedia.Api --no-build --launch-profile http -- --seed
+dotnet run --no-build --launch-profile http -- --seed
 ```
 
 La contraseña es un ejemplo público para cuentas ficticias locales, no una
@@ -77,7 +77,7 @@ restablece las contraseñas existentes. Solo funciona en Development.
 ## 5. Abrir Swagger
 
 ```powershell
-dotnet run --project src/BibliotecaMultimedia.Api --no-build --launch-profile http
+dotnet run --no-build --launch-profile http
 ```
 
 Abrir **http://localhost:5189/swagger**. HTTP es solo para pruebas locales.
@@ -143,6 +143,10 @@ Para repetir las pruebas, seguir el recorrido de la sección 6 desde Swagger.
 
 ## 8. Organización y alcance
 
+El archivo `BibliotecaMultimedia.Api.csproj` y `Program.cs` están directamente
+en la carpeta principal. Abrir esa carpeta en Visual Studio Code y ejecutar
+los comandos desde ella; no hace falta entrar en subcarpetas `src` o de proyecto.
+
 - Models: entidades y enumeraciones.
 - Data: contexto, migración y carga de prueba.
 - DTOs: contratos y mapeos de entrada/salida.
@@ -177,11 +181,12 @@ Después de guardar nuevos cambios en Git, actualizar el remoto con `git push`.
 Para generar un ZIP de los archivos del último commit, ejecutar desde la raíz:
 
 ```powershell
-git archive --format=zip --prefix=BibliotecaMultimedia/ --output=BibliotecaMultimedia-entrega.zip HEAD
+git archive --format=zip --prefix=BibliotecaMultimedia/ --output=BibliotecaMultimedia-entrega.zip HEAD BibliotecaMultimedia.Api.csproj BibliotecaMultimedia.slnx global.json dotnet-tools.json Program.cs appsettings.json appsettings.Development.json Controllers DTOs Data Models Infrastructure Properties
 ```
 
-El ZIP incluye los archivos versionados, el PDF y las migraciones.
-Las carpetas bin, obj, .vs, .git y los temporales no se incluyen.
+El ZIP contiene una sola carpeta principal con el proyecto y sus migraciones.
+El README y `docs/Evidencias.pdf` se mantienen fuera del ZIP, disponibles en el
+repositorio. Las carpetas bin, obj, .vs, .git y los temporales no se incluyen.
 La base se reconstruye con migraciones y datos de prueba, no mediante un .bak.
 
 ## Referencias técnicas
