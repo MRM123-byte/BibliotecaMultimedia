@@ -58,7 +58,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         Aplicar(c, dto);
         db.Contenidos.Add(c);
         await db.SaveChangesAsync();
-        // Recargar los géneros para devolver un DTO completo, sin entidades de EF.
         await db.Entry(c).Collection(x => x.Generos).Query().Include(x => x.Genero).LoadAsync();
         return CreatedAtAction(nameof(Obtener), new { id = c.ContenidoId }, c.Salida());
     }
@@ -140,7 +139,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         c.ImagenUrl = d.ImagenUrl; c.FechaLanzamiento = d.FechaLanzamiento; c.FechaSincronizacionUtc = DateTime.UtcNow;
         foreach (var g in c.Generos.Where(g => !d.GeneroIds.Contains(g.GeneroId)).ToList()) c.Generos.Remove(g);
         foreach (var id in d.GeneroIds.Where(id => c.Generos.All(g => g.GeneroId != id))) c.Generos.Add(new() { GeneroId = id });
-        // El MVP mantiene una referencia por ficha; PUT actualiza esa referencia.
         var r = c.Referencias.SingleOrDefault();
         if (r is null) { r = new(); c.Referencias.Add(r); }
         r.Proveedor = d.Referencia.Proveedor; r.TipoRecurso = d.Referencia.TipoRecurso; r.IdExterno = d.Referencia.IdExterno;
