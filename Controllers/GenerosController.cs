@@ -11,12 +11,10 @@ namespace BibliotecaMultimedia.Api.Controllers;
 [ApiController, Route("api/generos")]
 public class GenerosController(BibliotecaDbContext db) : ControllerBase
 {
-    /// <summary>Lista el vocabulario local de géneros.</summary>
     [HttpGet, ProducesResponseType<List<GeneroSalidaDto>>(200)]
     public async Task<ActionResult<List<GeneroSalidaDto>>> Listar() => Ok(await db.Generos.AsNoTracking()
         .OrderBy(g => g.Nombre).Select(g => new GeneroSalidaDto(g.GeneroId, g.Codigo, g.Nombre)).ToListAsync());
 
-    /// <summary>Consulta un género por su identificador.</summary>
     [HttpGet("{id:int}"), ProducesResponseType<GeneroSalidaDto>(200), ProducesResponseType<ProblemDetails>(404)]
     public async Task<ActionResult<GeneroSalidaDto>> Obtener(int id)
     {
@@ -24,7 +22,6 @@ public class GenerosController(BibliotecaDbContext db) : ControllerBase
         return g is null ? Problem(statusCode: 404, title: "Género no encontrado") : Ok(g.Salida());
     }
 
-    /// <summary>Crea un género. Solo Catalogador.</summary>
     [HttpPost, Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType<GeneroSalidaDto>(201), ProducesResponseType<ProblemDetails>(400)]
     [ProducesResponseType(401), ProducesResponseType(403)]
@@ -36,7 +33,6 @@ public class GenerosController(BibliotecaDbContext db) : ControllerBase
         return CreatedAtAction(nameof(Obtener), new { id = g.GeneroId }, g.Salida());
     }
 
-    /// <summary>Actualiza un género. Solo Catalogador.</summary>
     [HttpPut("{id:int}"), Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType(204), ProducesResponseType<ProblemDetails>(400), ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType(401), ProducesResponseType(403)]
@@ -48,7 +44,6 @@ public class GenerosController(BibliotecaDbContext db) : ControllerBase
         g.Nombre = dto.Nombre.Trim(); g.Codigo = dto.Codigo; await db.SaveChangesAsync(); return NoContent();
     }
 
-    /// <summary>Elimina un género sin obras asociadas. Solo Catalogador.</summary>
     [HttpDelete("{id:int}"), Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType(204), ProducesResponseType<ProblemDetails>(400), ProducesResponseType<ProblemDetails>(404)]
     [ProducesResponseType(401), ProducesResponseType(403)]

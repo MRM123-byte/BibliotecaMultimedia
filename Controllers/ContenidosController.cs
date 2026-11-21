@@ -16,7 +16,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
 {
     private IQueryable<Contenido> Detalles() => db.Contenidos.AsSplitQuery().Include(c => c.Generos).ThenInclude(g => g.Genero).Include(c => c.Referencias);
 
-    /// <summary>Lista el catálogo local con filtros y paginación.</summary>
     [HttpGet]
     [ProducesResponseType<PaginaDto<ContenidoSalidaDto>>(200)]
     [ProducesResponseType<ValidationProblemDetails>(400)]
@@ -33,7 +32,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         return Ok(new PaginaDto<ContenidoSalidaDto>(pagina, tamano, total, items.Select(c => c.Salida()).ToList()));
     }
 
-    /// <summary>Consulta una ficha, sus géneros y referencias externas.</summary>
     [HttpGet("{id:int}")]
     [ProducesResponseType<ContenidoSalidaDto>(200)]
     [ProducesResponseType<ProblemDetails>(404)]
@@ -43,7 +41,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         return c is null ? Problem(statusCode: 404, title: "Contenido no encontrado") : Ok(c.Salida());
     }
 
-    /// <summary>Crea una ficha con sus géneros y una referencia. Solo Catalogador.</summary>
     [HttpPost]
     [Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType<ContenidoSalidaDto>(201)]
@@ -62,7 +59,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         return CreatedAtAction(nameof(Obtener), new { id = c.ContenidoId }, c.Salida());
     }
 
-    /// <summary>Reemplaza los datos editables de una ficha. Solo Catalogador.</summary>
     [HttpPut("{id:int}")]
     [Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType(204)]
@@ -81,7 +77,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Elimina una ficha únicamente si no está en ninguna biblioteca.</summary>
     [HttpDelete("{id:int}")]
     [Authorize(Policy = "UsuarioApi", Roles = "Catalogador")]
     [ProducesResponseType(204)]
@@ -100,7 +95,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
         return NoContent();
     }
 
-    /// <summary>Consulta los géneros relacionados con una obra.</summary>
     [HttpGet("{id:int}/generos")]
     [ProducesResponseType<List<GeneroSalidaDto>>(200)]
     [ProducesResponseType<ProblemDetails>(404)]
@@ -111,7 +105,6 @@ public class ContenidosController(BibliotecaDbContext db) : ControllerBase
             .Select(c => new GeneroSalidaDto(c.GeneroId, c.Genero.Codigo, c.Genero.Nombre)).ToListAsync());
     }
 
-    /// <summary>Consulta la identidad externa de una ficha. No llama al proveedor.</summary>
     [HttpGet("{id:int}/referencias")]
     [ProducesResponseType<List<ReferenciaSalidaDto>>(200)]
     [ProducesResponseType<ProblemDetails>(404)]

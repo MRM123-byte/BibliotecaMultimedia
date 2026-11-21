@@ -18,7 +18,6 @@ public class BibliotecaController(BibliotecaDbContext db) : ControllerBase
     private string UsuarioId => User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     private IQueryable<EntradaBiblioteca> Propias() => db.EntradasBiblioteca.Include(e => e.Contenido).Where(e => e.UsuarioId == UsuarioId);
 
-    /// <summary>Lista la biblioteca privada con filtros, ordenación y paginación.</summary>
     [HttpGet, ProducesResponseType<PaginaDto<BibliotecaSalidaDto>>(200), ProducesResponseType<ValidationProblemDetails>(400)]
     public async Task<ActionResult<PaginaDto<BibliotecaSalidaDto>>> Listar(
         [FromQuery, EnumDataType(typeof(EstadoConsumo))] EstadoConsumo? estado,
@@ -44,7 +43,6 @@ public class BibliotecaController(BibliotecaDbContext db) : ControllerBase
         return Ok(new PaginaDto<BibliotecaSalidaDto>(pagina, tamano, total, items.Select(e => e.Salida()).ToList()));
     }
 
-    /// <summary>Consulta una entrada propia; las entradas ajenas también devuelven 404.</summary>
     [HttpGet("{id:int}"), ProducesResponseType<BibliotecaSalidaDto>(200), ProducesResponseType<ProblemDetails>(404)]
     public async Task<ActionResult<BibliotecaSalidaDto>> Obtener(int id)
     {
@@ -52,7 +50,6 @@ public class BibliotecaController(BibliotecaDbContext db) : ControllerBase
         return e is null ? Problem(statusCode: 404, title: "Entrada no encontrada") : Ok(e.Salida());
     }
 
-    /// <summary>Añade una obra existente en estado Pendiente.</summary>
     [HttpPost, ProducesResponseType<BibliotecaSalidaDto>(201), ProducesResponseType<ProblemDetails>(400)]
     public async Task<ActionResult<BibliotecaSalidaDto>> Crear(BibliotecaCrearDto dto)
     {
@@ -64,7 +61,6 @@ public class BibliotecaController(BibliotecaDbContext db) : ControllerBase
         return CreatedAtAction(nameof(Obtener), new { id = e.EntradaBibliotecaId }, e.Salida());
     }
 
-    /// <summary>Reemplaza estado, puntuación y reseña. NULL retira la nota o reseña.</summary>
     [HttpPut("{id:int}"), ProducesResponseType(204), ProducesResponseType<ProblemDetails>(400), ProducesResponseType<ProblemDetails>(404)]
     public async Task<IActionResult> Actualizar(int id, BibliotecaActualizarDto dto)
     {
@@ -75,7 +71,6 @@ public class BibliotecaController(BibliotecaDbContext db) : ControllerBase
         e.FechaModificacionUtc = DateTime.UtcNow; await db.SaveChangesAsync(); return NoContent();
     }
 
-    /// <summary>Retira la entrada personal, sin eliminar la ficha compartida.</summary>
     [HttpDelete("{id:int}"), ProducesResponseType(204), ProducesResponseType<ProblemDetails>(404)]
     public async Task<IActionResult> Eliminar(int id)
     {

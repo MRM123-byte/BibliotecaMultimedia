@@ -30,7 +30,6 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "Mauricio Rivero Mendez. Inicia sesión en /api/auth/login (useCookies=false), copia accessToken y pégalo en Authorize. Catálogo: lectura pública y escritura para Catalogador. Biblioteca: acceso privado. Datos de demostración ficticios; sin llamadas externas."
     });
-    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, "BibliotecaMultimedia.Api.xml"));
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Type = SecuritySchemeType.Http,

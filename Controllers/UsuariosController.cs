@@ -12,7 +12,6 @@ namespace BibliotecaMultimedia.Api.Controllers;
 [Authorize(Policy = "UsuarioApi")]
 public class UsuariosController(BibliotecaDbContext db) : ControllerBase
 {
-    /// <summary>Devuelve el perfil propio sin contraseñas ni información de otros usuarios.</summary>
     [HttpGet("me"), ProducesResponseType<UsuarioSalidaDto>(200), ProducesResponseType(401)]
     public async Task<ActionResult<UsuarioSalidaDto>> Perfil()
     {
